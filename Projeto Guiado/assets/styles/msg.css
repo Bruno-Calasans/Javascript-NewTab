@@ -1,0 +1,23 @@
+
+
+#msg{
+    display: flex;
+    align-items: center;
+    width: 100%;
+    justify-self: center;
+    padding: 5px;
+    font-weight: bold;
+    border-radius: 4px;
+    display: none;
+}
+
+#sucessoIcon:before{content: 'done'}
+#avisoIcon:before{content: 'warning'}
+#erroIcon:before{content: 'error'}
+
+.sucesso{background-color: rgb(118, 243, 168); color: rgb(0, 87, 0);}
+
+.aviso{background-color: rgb(242, 242, 127); color: rgb(83, 83, 3);}
+
+.erro{background-color: rgb(244, 111, 101); color: rgb(96, 2, 2);}
+

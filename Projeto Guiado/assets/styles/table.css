@@ -15,8 +15,9 @@ thead{background-color: #f54e3b;}
 /* linhas do corpo da tabela */
 tbody tr:nth-child(2n){background-color: rgb(137, 175, 228);}
 
-/*botão alterar*/
-.btnAlterar{
+/* botão alterar e excluir */
+.btnAlterar, .btnExcluir{
+    margin: 2px;
     padding: 5px;
     cursor: pointer;
 }

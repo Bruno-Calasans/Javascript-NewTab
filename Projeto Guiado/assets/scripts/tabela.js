@@ -1,5 +1,5 @@
 
-
+    
     // cada pessoa da tabela
     class Pessoa{
 
@@ -11,9 +11,11 @@
 
     }
 
-    // funções genéricas
-    isArray = dado => dado.constructor == Array
-    isObj = dado =>  dado instanceof Object
+    // funções genéricas de verificação
+    isArray = dado => dado instanceof Array
+    isObj = dado => dado instanceof Object
+    isHTML = dado => dado instanceof HTMLElement
+
 
     // cria um elemento HTML com a classe desejada
     function criarElemento(tag, classeId, usarId=false){
@@ -33,27 +35,17 @@
         if(usarId) return document.getElementById(classeId)
         else return document.getElementsByClassName(classeId)
     }
-   
-   function transformArray(collection){
 
-        let array = []
+    // selciona qualquer elemento a partir do query selector
+    function selector(selector, all=false, useId=true){
 
-        if(collection instanceof NodeList || collection instanceof HTMLAllCollection)
-            for(let item of collection) array.push(item)
-        
-        // se for um objeto
-        else 
-            for(let atrb in collection) array.push(collection[atrb])
-
-       return array
-      
-   }
-
-   function selector(selector, all=false){
-
-       if(all) return document.querySelectorAll(selector)
-       else return document.querySelector(selector)
-   }
+        let simb = useId ? '#' : '.'
+        if(all) return document.querySelectorAll(`${simb}${selector}`)
+        else return document.querySelector(`${simb}${selector}`)
+    }
+ 
+    // transforma qualquer objeto para array
+    Object.prototype.toArray = function(){return Object.values(this)}
 
     class Table{
 
@@ -67,24 +59,27 @@
 
             // head da tabela
             this.head = {
-                id: selector(`#${tableId} thead`).id, 
-                elemento: selector(`#${tableId} thead`),
-                linha: selector(`#${tableId} thead tr`),
-                celulas: selector(`#${tableId} thead th`, true)
+                id: selector(`${tableId} thead`).id, 
+                elemento: selector(`${tableId} thead`),
+                linha: selector(`${tableId} thead tr`),
+                celulas: selector(`${tableId} thead th`, true)
             }
 
             // body da tabela
             this.body = {
-                id: selector(`#${tableId} tbody`).id, 
-                elemento: selector(`#${tableId} tbody`),
-                celulas: selector(`#${tableId} tbody td`, true),
+                id: selector(`${tableId} tbody`).id, 
+                elemento: selector(`${tableId} tbody`),
+                celulas: selector(`${tableId} tbody td`, true),
                 linhas: {
-                    elementos: transformArray(selector(`#${tableId} tbody tr`, true)),
-                    classe: selector(`#${tableId} tbody tr`) ? selector(`#${tableId} tbody tr`).className : '',
+                    elementos: (selector(`${tableId} tbody tr`, true)).toArray(),
+                    classe: selector(`${tableId} tbody tr`) ? selector(`${tableId} tbody tr`).className : '',
                 }
             }
 
             // configurações iniciais da tabela
+            //this.inserirLinhas('table-row', this.dados)
+            // configuração inicial do local storage
+            localStorage.clear()
             this.inserirLinhas('table-row', this.dados)
         }
 
@@ -92,18 +87,68 @@
         get numLinhas(){return this.body.elemento.children.length}
         get numColunas(){return this.head.linha.children.length}
 
-        // atualiza os dados da tabela
+        // métodos de atualização
+        atualizarHead(){
+
+            this.head = {
+                id: selector(`${this.tableId} thead`).id, 
+                elemento: selector(`${this.tableId} thead`),
+                linha: selector(`${this.tableId} thead tr`),
+                celulas: selector(`${this.tableId} thead th`, true)
+            }
+        }
+
+        atualizarBody(){
+
+            this.body = {
+                id: selector(`${this.tableId} tbody`).id, 
+                elemento: selector(`${this.tableId} tbody`),
+                celulas: selector(`${this.tableId} tbody td`, true),
+                linhas: {
+                    elementos: (selector(`${this.tableId} tbody tr`, true)).toArray(),
+                    classe: selector(`${this.tableId} tbody tr`) ? selector(`${this.tableId} tbody tr`).className : ''
+                }
+            }
+
+            this.atualizarBtns()
+        }
+
+        atualizarBtns(){
+
+            // para os botões de excluir
+            let btnsExcluir = selector('btnExcluir', true, false)
+
+            btnsExcluir.forEach((btn, index) => {
+                btn.onclick = e => this.removerLinha(index)
+            })
+
+        }
+
         atualizarDados(){this.dados = localStorage.getObjs(this.key)}
 
-        inserirDado(novoDado){
+        // atualiza toda a tabela
+        atualizar(){
 
+            this.atualizarHead()
+            this.atualizarBody()
+            this.atualizarDados()
+        }
+
+        // insere dado no local storage
+        inserirDado(obj){
+
+            // verificando se é um objeto
+            if(!isObj(obj)) return false
+
+            // caso não exista uma chave no local storage
             if(!localStorage.keyExists(this.key))
-                localStorage.saveObjs(this.key, novoDado)
+                localStorage.saveObjs(this.key, obj)
 
-            else 
-                localStorage.insertObjs(this.key, novoDado)
+            else
+                localStorage.insertObjs(this.key, obj)
         
             this.atualizarDados()
+            this.atualizarBody()
         }
 
         // remove uma linha pra sempre
@@ -112,6 +157,7 @@
             // se tiver o index
             if(index <= this.numLinhas - 1){
 
+                // removendo elemento do DOM
                 this.body.linhas.elementos[index].remove()
 
                 // atualizando o array de linhas
@@ -119,6 +165,10 @@
 
                 //atualizando os dados e o localStorage
                 localStorage.removeObj(this.key, index)
+
+                // verificando se há objeto para deletar
+                //console.log(localStorage.getObjs(this.key));
+
                 this.atualizarBody()
 
                 return true
@@ -134,8 +184,12 @@
             // caso tenha linhas para limpar
             if(this.numLinhas > 0){
                 while (this.numLinhas) this.removerLinha(0)
-                localStorage.clear()
+
+                // atualizando a tabela toda
                 this.atualizar()
+
+                // limpando o local storage
+                localStorage.clear()
 
                 // caso tenha limpado com sucesso
                 return true
@@ -144,55 +198,14 @@
             else return false
         }
 
-        // atualiza o head da tabela
-        atualizarHead(){
+        // cria uma elemento tr(table row) com um objeto
+        criarLinha(classeId, obj){
 
-            this.head = {
-                id: selector(`#${this.tableId} thead`).id, 
-                elemento: selector(`#${this.tableId} thead`),
-                linha: selector(`#${this.tableId} thead tr`),
-                celulas: selector(`#${this.tableId} thead th`, true)
-            }
+            // verificando se um objeto foi passado
+            if(!isObj(obj)) return false
 
-        }
-
-        // atualizado  body da tabela
-        atualizarBody(){
-
-            this.body = {
-                id: selector(`#${this.tableId} tbody`).id, 
-                elemento: selector(`#${this.tableId} tbody`),
-                celulas: selector(`#${this.tableId} tbody td`, true),
-                linhas: {
-                    elementos: transformArray(selector(`#${this.tableId} tbody tr`, true)),
-                    classe: selector(`#${this.tableId} tbody tr`) ? selector(`#${this.tableId} tbody tr`).className : ''
-                }
-            }
-
-        }
-
-        atualizarLinhas(){
-            this.inserirLinhas('table-row', this.dados)
-            this.atualizar()
-        }
-
-        atualizar(){
-
-            // atualizando o head
-            this.atualizarHead()
-           
-            // atualizando body
-            this.atualizarBody()
-
-            // atualizando dados
-            this.atualizarDados()
-        }
-
-        // cria uma linha
-        criarLinha(classeId, dados){
-
-            // dados pode ser um array ou objeto
-            dados = isObj(dados) ? transformArray(dados) : dados
+            // transformando o objeto em arrays
+            let dados = obj.toArray()
             
             // o número de dados tem que ser igual ao número de colunas
             const linha = criarElemento('tr', classeId)
@@ -204,25 +217,31 @@
                 linha.appendChild(td)
             }
 
-            // criando o botão
-            const btn = criarElemento('button', 'btnAlterar')
+            // criando os botões
+            const btnExcluir = criarElemento('button', 'btnExcluir')
+            btnExcluir.innerHTML = 'Excluir'
+            const btnAlterar = criarElemento('button', 'btnAlterar')
+            btnAlterar.innerHTML = 'Alterar'
+
             const td = criarElemento('td')
-            btn.innerHTML = 'Alterar'
-            td.appendChild(btn)
+            td.appendChild(btnExcluir)
+            td.appendChild(btnAlterar)
+
             linha.appendChild(td)
 
             return linha
         }
 
         // cria várias linhas
-        criarLinhas(classeId, ...dados){
+        criarLinhas(classeId, ...objs){
+
+            // se tiver apenas um elemento e for um array de objetos
+            if(objs.length == 1 && isArray(dados[0])) objs = objs[0]
 
             let linhas = []
 
-            if(dados.length == 1) dados = dados[0]
-
-            for(let dado of dados){
-                let linha = this.criarLinha(classeId, dado)
+            for(let obj of objs){
+                let linha = this.criarLinha(classeId, obj)
                 linhas.push(linha)
             }
 
@@ -230,48 +249,41 @@
         }
 
         // insere uma linha na tabela
-        inserirLinha(linha, classeId){
+        inserirLinha(classeId, obj){
 
-            // se não for um elemento HTML
-            if(!(linha instanceof HTMLElement)){
+            // verificando se é um objeto
+            if(!isObj(obj)) return false
 
-                if(isObj(linha)) this.inserirDado(linha)
+            // criando um elemento tr(table row) e inserindo no body da tabela
+            let linha = this.criarLinha(classeId, obj)
+            this.body.elemento.appendChild(linha)
 
-                classeId = classeId ?? 'table-row'
-                let novaLinha = this.criarLinha(classeId, linha)
-                this.body.elemento.appendChild(novaLinha)
-
-            // se for um elemento HTML
-            }else{
-                this.body.elemento.appendChild(linha)
-            }
-
+            // inserindo o dado no local storage
+            this.inserirDado(obj)
+        
             // atualizando o body
             this.atualizarBody()
         }
 
         // insere várias linhas na tabela
-        inserirLinhas(classeId, ...dados){
+        inserirLinhas(classeId, ...objs){
 
-            if(dados.length == 1 && isArray(dados[0])) dados = dados[0]
+            if(objs.length == 1 && isArray(objs[0])) objs = objs[0]
 
-            // se for um objeto
-            dados.forEach(dado => {if(isObj(dado)) this.inserirDado(dado)})
-            
-            let linhas = this.criarLinhas(classeId, dados)
-            
-            linhas.forEach(linha => this.inserirLinha(linha))
+            // inserindo os objetos na tabela
+            objs.forEach(obj => this.inserirLinha(classeId, obj))
         }
 
         getLinha(index){
 
-            // verificando se oi index existe
+            // verificando se o index existe
             if(index > this.numLinhas - 1) return null
+
             let linha = this.body.linhas.elementos[index]
             return linha
         }
 
-        alterarLinha(index, novosDados){
+        alterarLinha(index, obj){
 
             // novosDados pode ser um array ou objeto
 
@@ -279,16 +291,17 @@
             let linha = this.getLinha(index)
             if(!linha) return null // verificando se a linha existe
 
-            let dados = novosDados
+            // verificando se é um objeto
+            if(!isObj(obj)) return false
 
-            // caso seja um objeto, será transformado em array
-            if(isObj(novosDados)){
-                dados = transformArray(novosDados)
-                localStorage.updateObj(this.key, index, novosDados)
-            }
-           
+            // atualizando o objeto no local storage
+            localStorage.updateObj(this.key, index, obj)
+
+            // transformando o objeto em array
+            let dados = obj.toArray()
+            
             // pegando todos os tds(table datas) da linha em forma de array
-            let tds = transformArray(linha.children)
+            let tds = linha.children.toArray()
 
             // cada elemento de tds será um table data da linha
             for(let i = 0; i < dados.length; i++) tds[i].innerHTML = dados[i]
@@ -299,7 +312,7 @@
     // criando métodos para Local Storage --------------------------------------
 
     // converte um objeto para string
-    objToString = obj => JSON.stringify(obj)
+    function objToString(obj){return JSON.stringify(obj)}
     
     // salva um objeto na Local Storage
     Storage.prototype.saveObj = function (key, obj){
@@ -311,8 +324,7 @@
     // salva vários objetos na local storage em forma de array
     Storage.prototype.saveObjs = function(key, ...objs){
 
-        if(objs.length == 1 && isArray(objs[0])) objs = objs[0]
-
+        if(objs.length == 1 && isArray(objs[0]))objs = objs[0]
         let array = JSON.stringify(objs)
         this.setItem(key, array)
     }
@@ -369,7 +381,7 @@
         let objs = this.getObjs(key)
 
         // verificando se o index existe
-        if(index > objs.lenght - 1) return null
+        if(index > objs.lenght - 1) return false
 
         objs.splice(index, 1)
         this.saveObjs(key, objs)
@@ -393,12 +405,12 @@
     }
 
     // testes
-    const p1 = new Pessoa('Fudido Fudência', '12314124')
+    /*const p1 = new Pessoa('Fudido Fudência', '12314124')
     const p2 = new Pessoa('Ana Aloprada', '11321314', true)
     const p3 = new Pessoa('Clemência Lopes', '4324325', true)
-    const p4 = new Pessoa('Eclesiástico Elástico', '44694896')
+    const p4 = new Pessoa('Eclesiástico Elástico', '44694896')*/
 
-
+    
     // lista com todas as pessoas
     if(localStorage.pessoas)
         var pessoas = localStorage.getObjs('pessoas')
@@ -407,4 +419,4 @@
 
     // criando uma tabela
     const table = new Table('lista', pessoas, 'pessoas')
-   
+
