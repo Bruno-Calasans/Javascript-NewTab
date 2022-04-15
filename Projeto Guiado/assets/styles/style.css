@@ -1,0 +1,61 @@
+
+*{
+    margin: 0px;
+    box-sizing: border-box;
+}
+
+/* tags principais -----------------------------------------------------------*/
+body{
+    display: grid;
+    height: 100vh;
+    grid-template-rows: 100px 1fr 50px;
+    grid-template-areas: 'header' 'main' 'footer';
+    font-family: Verdana, Geneva, Tahoma, sans-serif;
+}
+
+header{
+    display: flex;
+    grid-area: header;
+    padding: 10px;
+    background-image: linear-gradient(to left, #f54e3b, #0a0ab1);
+}
+
+.logo{
+    height: 100%;
+}
+
+
+/* tags semânticas -----------------------------------------------------------*/
+main{
+    grid-area: main;
+    padding: 10px;
+}
+
+.menu{
+    display: flex;
+    justify-content: center;
+}
+
+.menu a{
+    padding: 10px;
+    margin: 5px;
+    background-color: red;
+    color: white;
+    border-radius: 4px;
+    text-decoration: none;
+    transition: background-color 0.5s;
+}
+
+.menu a:hover{
+    background-color: blue;
+    transition: background-color 0.5s;
+}
+
+
+/* footer --------------------------------------------------------------------*/
+footer{
+    grid-area: footer;
+    text-align: center;
+    align-self: center;
+    font-style: italic;
+}

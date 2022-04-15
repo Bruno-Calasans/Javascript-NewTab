@@ -1,0 +1,39 @@
+/* tabela -------------------------------------------------------*/
+table{
+    
+    margin: auto;
+    max-width: 700px;
+    padding: 5px;
+    border-collapse: collapse;
+    justify-content: center;
+    flex-grow: 2; 
+}
+
+/* cabeçalhos da tabela */
+thead{background-color: #f54e3b;}
+
+/* linhas do corpo da tabela */
+tbody tr:nth-child(2n){background-color: rgb(137, 175, 228);}
+
+/*botão alterar*/
+.btnAlterar{
+    padding: 5px;
+    cursor: pointer;
+}
+
+/*colunas*/
+th, td{
+    text-align: center;
+    border: 0.5px solid black;
+    padding: 5px;
+    width: 200px;
+}
+
+/*coluna nome*/
+tr th:nth-child(1){width: 50%;}
+
+/*coluna experiência*/
+tr th:nth-child(3){width: 10%;}
+
+/*coluna ações*/
+tr th:nth-child(4){width: 10%;}

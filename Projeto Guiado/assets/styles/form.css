@@ -1,0 +1,66 @@
+
+body{
+    min-width: 320px;
+}
+
+main{
+    display: flex;
+    justify-content: center;
+    align-items: flex-start;
+}
+
+/* formulário e seus elementos -----------------------------------------------*/
+form{
+    display: grid;
+    padding: 5px;
+    width: 60%;
+    grid-template-columns: 1fr;
+}
+
+.form-input{
+    display: flex;
+    flex-direction: column;
+    padding: 10px;
+    width: 100%;
+    padding: 10px;
+}
+
+#nome, #telefone{
+    padding: 5px;
+}
+
+/* div com radios ------------------------------------------------------------*/
+.radios{
+    flex-direction: row;
+    justify-content: flex-start;
+}
+
+/*cada div dentro da div com radios*/
+.radios div{
+    padding: 2px;
+}
+
+/* botão submit --------------------------------------------------------------*/
+input[type=submit]{
+    border: 0px;
+    border-radius: 4px;
+    padding: 5px;
+    cursor: pointer;
+    background-color: red;
+    color: white;
+    font-weight: bold;
+    transition:  background-color 1s;
+}
+
+input[type=submit]:hover{
+    background-color: green;
+    transition:  background-color 1s;
+}
+
+@media (max-width: 530px){
+
+    .radios{
+        flex-direction: column;
+        align-items: center;
+    }
+}
