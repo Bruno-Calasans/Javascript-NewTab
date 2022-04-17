@@ -1,52 +1,8 @@
 
     
-    // cada pessoa da tabela
-    class Pessoa{
-
-        constructor(nome='', telefone='', experiencia=false){
-            this.nome = nome
-            this.tel = telefone
-            this.exp = experiencia ? 'Sim': 'Não'
-        }
-
-    }
-
-    // funções genéricas de verificação
-    isArray = dado => dado instanceof Array
-    isObj = dado => dado instanceof Object
-    isHTML = dado => dado instanceof HTMLElement
-
-
-    // cria um elemento HTML com a classe desejada
-    function criarElemento(tag, classeId, usarId=false){
-
-        const elemento = document.createElement(tag)
-
-        if(classeId && !usarId) elemento.className = classeId 
-        else if(classeId) elemento.id = classeId 
-        else return elemento
-
-        return elemento
-    }
-
-    // pega qualquer elemento HTML por classe ou id
-    function getElemento(classeId, usarId=true){
-
-        if(usarId) return document.getElementById(classeId)
-        else return document.getElementsByClassName(classeId)
-    }
-
-    // selciona qualquer elemento a partir do query selector
-    function selector(selector, all=false, useId=true){
-
-        let simb = useId ? '#' : '.'
-        if(all) return document.querySelectorAll(`${simb}${selector}`)
-        else return document.querySelector(`${simb}${selector}`)
-    }
- 
-    // transforma qualquer objeto para array
-    Object.prototype.toArray = function(){return Object.values(this)}
-
+    import {Pessoa, objsConfig, LSConfig} from './classes.js'
+    import {isArray, isObj, isHTML, getElemento, criarElemento, selector} from './functions.js'
+    
     class Table{
 
         constructor(tableId, dados, key) {
@@ -117,9 +73,16 @@
 
             // para os botões de excluir
             let btnsExcluir = selector('btnExcluir', true, false)
+            let linksAlterar = selector('linkAlterar', true, false)
+
+           
 
             btnsExcluir.forEach((btn, index) => {
                 btn.onclick = e => this.removerLinha(index)
+            })
+
+            linksAlterar.forEach((link, index) => {
+                link.setAttribute('href', `cadastro.html?index=${index}`)
             })
 
         }
@@ -220,12 +183,15 @@
             // criando os botões
             const btnExcluir = criarElemento('button', 'btnExcluir')
             btnExcluir.innerHTML = 'Excluir'
+
+            const link = criarElemento('a', 'linkAlterar')
             const btnAlterar = criarElemento('button', 'btnAlterar')
             btnAlterar.innerHTML = 'Alterar'
-
+            link.appendChild(btnAlterar)
+           
             const td = criarElemento('td')
             td.appendChild(btnExcluir)
-            td.appendChild(btnAlterar)
+            td.appendChild(link)
 
             linha.appendChild(td)
 
@@ -309,109 +275,15 @@
 
     }
 
-    // criando métodos para Local Storage --------------------------------------
-
-    // converte um objeto para string
-    function objToString(obj){return JSON.stringify(obj)}
-    
-    // salva um objeto na Local Storage
-    Storage.prototype.saveObj = function (key, obj){
-
-        let json = objToString([obj])
-        this.setItem(key, json)
-    }
-
-    // salva vários objetos na local storage em forma de array
-    Storage.prototype.saveObjs = function(key, ...objs){
-
-        if(objs.length == 1 && isArray(objs[0]))objs = objs[0]
-        let array = JSON.stringify(objs)
-        this.setItem(key, array)
-    }
-
-    // pega todos os objetos da local storage de uma determinada key
-    Storage.prototype.getObjs = function (key){
-
-        // verificando se algum valor para essa chave
-        let strObjArray = this.getItem(key)
-        if(!strObjArray) return null
-
-        // transformando cada string obj em array
-        let objArray = JSON.parse(strObjArray)
-        return objArray
-    }
-
-    Storage.prototype.keyExists = function (key){
-        return this.getItem(key) ? true : false
-    }
-
-    // pega um obj a partir da sua chave e index no array de objetos
-    Storage.prototype.getObj = function (key, index){
-
-        // verificando se há alguma item com a key fornecida
-        if(!this.keyExists(key)) return null
-
-        let objs = this.getObjs(key) // array de objs
-
-        // verificando se há algum número com este index no array
-        if(index > objs.length - 1) return null
-
-        return objs[index]
-    }
-
-    // atualizando array de objs
-    Storage.prototype.insertObjs = function (key, ...objs){
-
-        if(objs.length == 1 && isArray(objs[0])) objs = objs[0]
-
-        // verificando se a key existe
-        if(!this.keyExists(key)) return null
-
-        let arrayObjs = this.getObjs(key)
-        let novoArray = [...arrayObjs, ...objs]
-        this.saveObjs(key, novoArray)
-    }
-
-    // remove um objeto do local storage
-    Storage.prototype.removeObj = function(key, index){
-
-        // verificando se a chave existe
-        if(!this.keyExists(key)) return null
-
-        let objs = this.getObjs(key)
-
-        // verificando se o index existe
-        if(index > objs.lenght - 1) return false
-
-        objs.splice(index, 1)
-        this.saveObjs(key, objs)
-    }
-
-    // altera um objeto
-    Storage.prototype.updateObj = function (key, index, novoObj){
-
-        // verificando se a chave existe
-       if(!this.keyExists(key)) return null
-
-       let objProcurado = this.getObj(key, index)
-
-       // verificando se o objeto com aquele index existe
-       if(!objProcurado) return null
-       let objs = this.getObjs(key)
-    
-       objs.splice(index, 1, novoObj)
-      
-       this.saveObjs(key, ...objs)
-    }
-
     // testes
     /*const p1 = new Pessoa('Fudido Fudência', '12314124')
     const p2 = new Pessoa('Ana Aloprada', '11321314', true)
     const p3 = new Pessoa('Clemência Lopes', '4324325', true)
     const p4 = new Pessoa('Eclesiástico Elástico', '44694896')*/
+    //localStorage.saveObj('pessoas', p1)
 
     
-    // lista com todas as pessoas
+    // verificando Local Storage
     if(localStorage.pessoas)
         var pessoas = localStorage.getObjs('pessoas')
     else 

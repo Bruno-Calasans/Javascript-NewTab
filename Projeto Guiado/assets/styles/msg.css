@@ -1,23 +1,41 @@
 
-
-#msg{
+/* corpo da mensagem */
+.msg{
+    position: relative;
     display: flex;
     align-items: center;
     width: 100%;
     justify-self: center;
     padding: 5px;
-    font-weight: bold;
     border-radius: 4px;
-    display: none;
+    margin-top: 5px;
+    font-family: sans-serif;
 }
 
-#sucessoIcon:before{content: 'done'}
-#avisoIcon:before{content: 'warning'}
-#erroIcon:before{content: 'error'}
+/* botão de fechar */
+.closeBtn{
+    color: rgba(132, 130, 130, 0.891);
+    font-weight: bold;
+    position: absolute;
+    right: 5px;
+    font-size: 1.2em;
+    opacity: 0.5;
+    cursor: pointer;
+}
 
+
+.closeBtn::before{content: '\D7';}
+
+.closeBtn:hover{color: black;}
+
+/* símbolo da mensagem */
+.sucessoIcon, .avisoIcon, .erroIcon{margin-right: 0px;}
+.sucessoIcon:before{content: 'done'}
+.avisoIcon:before{content: 'warning'}
+.erroIcon:before{content: 'error'}
+
+/* coloração da mensagem */
 .sucesso{background-color: rgb(118, 243, 168); color: rgb(0, 87, 0);}
-
 .aviso{background-color: rgb(242, 242, 127); color: rgb(83, 83, 3);}
-
 .erro{background-color: rgb(244, 111, 101); color: rgb(96, 2, 2);}
 

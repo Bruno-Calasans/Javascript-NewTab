@@ -10,7 +10,7 @@
     <link rel="stylesheet" href="assets/styles/style.css">
     <link rel="stylesheet" href="assets/styles/form.css">
     <link rel="stylesheet" href="assets/styles/msg.css">
-    <script src="assets/scripts/cadastro.js" defer></script>
+    <script type="module" src="assets/scripts/cadastro.js" defer></script>
 </head>
 <body>
 
@@ -26,24 +26,20 @@
         
         <form action="#" id="cadastro">
 
-            <div id="msg" class="sucesso">
-                <span id="sucessoIcon" class="material-icons"></span>msg
-            </div>
+            <div id="area-msgs"></div>
 
             <div class="form-input">
                 <label for="nome">Nome</label>
                 <input type="text" id="nome" 
-                pattern="^[a-zA-Z][a-zA-Z\s]+[a-zA-Z]$"
-                title="Insira apenas letras e espaços; não insira espaço no começo ou fim do nome"
-                placeholder="Seu nome completo" required>
+             
+                placeholder="Seu nome completo" >
             </div>
 
             <div class="form-input">
                 <label for="telefone">Telefone</label>
                 <input type="tel" id="telefone" 
-                pattern="\(\d{2}\) 9\d{4}-\d{4}"
-                title="O formato do número dever ser (xx) 9xxxx-xxxx"
-                placeholder="(xx) 9xxxx-xxxx" required>
+              
+                placeholder="(xx) 9xxxx-xxxx" >
             </div>
 
             <div class="form-input radios">

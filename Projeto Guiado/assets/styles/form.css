@@ -1,7 +1,5 @@
 
-body{
-    min-width: 320px;
-}
+body{min-width: 320px;}
 
 main{
     display: flex;
@@ -13,7 +11,7 @@ main{
 form{
     display: grid;
     padding: 5px;
-    width: 60%;
+    width: 400px;
     grid-template-columns: 1fr;
 }
 
@@ -25,9 +23,7 @@ form{
     padding: 10px;
 }
 
-#nome, #telefone{
-    padding: 5px;
-}
+#nome, #telefone{padding: 5px;}
 
 /* div com radios ------------------------------------------------------------*/
 .radios{
@@ -36,9 +32,7 @@ form{
 }
 
 /*cada div dentro da div com radios*/
-.radios div{
-    padding: 2px;
-}
+.radios div{padding: 2px;}
 
 /* botão submit --------------------------------------------------------------*/
 input[type=submit]{
@@ -58,6 +52,9 @@ input[type=submit]:hover{
 }
 
 @media (max-width: 530px){
+
+
+    .form-input .radios{color: red}
 
     .radios{
         flex-direction: column;
