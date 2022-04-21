@@ -7,8 +7,9 @@
     function isString(dado){return dado.constructor == String}
 
 
+
      // cria um elemento HTML com a classe desejada
-     function criarElemento(tag, classeId, usarId=false){
+    function criarElemento(tag, classeId, usarId=false){
 
         const elemento = document.createElement(tag)
 
@@ -44,5 +45,41 @@
         else return document.querySelector(`${simb}${selector}`)
     }
 
-    export {isArray, isObj, isString, isHTML, criarElemento, getElemento, inserirDentro,selector}
+    function validarTel(valor, formato=0){
+
+        const formatos = [
+            /(\(?\d{2}\)?)(\s?9)(\d{4})([ -]?)(\d{4})/,
+            /(\(\d{2}\))( 9)(\d{4})-(\d{4})/
+        ]
+
+        return formatos[formato].test(valor)
+    }
+
+    function isNumber(valor){
+
+        const regexNumber = /[^\D]/g
+        return regexNumber.test(valor)
+    }
+
+    function isLetter(valor, formato=0){
+
+        const formatos = [
+            /[ a-zA-Z]/, // com espaço
+            /[a-zA-Z]/ // sem espaço
+        ]
+        return formatos[formato].test(valor)
+    }
+
+    function validarNome(nome){
+
+        const regexNome = /^[a-zA-Z][a-zA-Z ]+[a-zA-Z]$/
+        return regexNome.test(nome)
+
+    }
+
+
+
+    export {
+        isArray, isObj, isString, isHTML, criarElemento, getElemento, 
+        validarTel, isNumber, validarNome, isLetter, inserirDentro,selector}
 
